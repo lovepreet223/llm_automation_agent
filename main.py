@@ -8,6 +8,7 @@ import base64
 
 app = FastAPI()
 
+OPENAI_API_KEY = ""
 AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN")  # Load API key from environment
 AIPROXY_BASE_URL = "https://aiproxy.sanand.workers.dev/openai"
 use_openai_api = False
@@ -88,8 +89,10 @@ async def read_file(path: str = Query(..., description="Path to the file to be r
         path (str): The file path to read.
 
     Returns:
-        HTTP 200 OK with file content if successful.
+        The file content as a plain string if successful.
         HTTP 404 Not Found if the file does not exist.
+        HTTP 403 Forbidden if access is denied.
+        HTTP 500 Internal Server Error if an error occurs.
     """
     #path = ensure_local_path(path)
     # Ensure path is relative to BASE_DIR to avoid duplication
@@ -106,7 +109,7 @@ async def read_file(path: str = Query(..., description="Path to the file to be r
     try:
         with open(path, "r", encoding="utf-8") as file:
             content = file.read()
-        return {"status": "success", "content": content}
+        return content
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
 
