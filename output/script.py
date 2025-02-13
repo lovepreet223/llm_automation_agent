@@ -1,51 +1,40 @@
 # /// script
-# requires-python = ">=3.9"
+# requires-python = ">=3.09"
 # dependencies = [
-#   "uv",
+#   "subprocess",
 # ]
 # ///
 import subprocess
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Hardcoded email argument for the script
-EMAIL_ARG = "24f2006061@ds.study.iitm.ac.in"
-DATAGEN_URL = "https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/project-1/datagen.py"
+# Hardcoded commands and paths
+DATA_DIR = "/data"
+NPM_INSTALL_COMMAND = "npm install -g prettier@3.4.2"
+PRETTIER_COMMAND = "prettier --write format.md"
 
-def check_uv_installed():
-    logging.info("Checking if 'uv' is installed.")
-    result = subprocess.run(['pip', 'show', 'uv'], capture_output=True, text=True)
-    return result.returncode == 0
+def navigate_and_install():
+    logging.info("Navigating to the /data directory and installing Prettier.")
+    try:
+        os.chdir(DATA_DIR)
+        subprocess.run(NPM_INSTALL_COMMAND, check=True, shell=True)
+        logging.info("Successfully installed Prettier.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error during npm installation: {e}", exc_info=True)
+        return False
+    return True
 
-def install_uv():
-    logging.info("'uv' is not installed, installing now.")
-    result = subprocess.run(['pip', 'install', 'uv'], capture_output=True, text=True)
-    if result.returncode != 0:
-        logging.error(f"Failed to install 'uv': {result.stderr}")
-        exit(1)
-
-def download_datagen_script():
-    logging.info("Downloading datagen.py")
-    result = subprocess.run(['curl', '-O', DATAGEN_URL], capture_output=True, text=True)
-    if result.returncode != 0:
-        logging.error(f"Failed to download datagen.py: {result.stderr}")
-        exit(1)
-
-def run_datagen_script():
-    logging.info("Running datagen.py.")
-    result = subprocess.run(['uv', 'run', 'datagen.py', EMAIL_ARG], capture_output=True, text=True)
-    if result.returncode != 0:
-        logging.error(f"Failed to run datagen.py: {result.stderr}")
-        exit(1)
-    logging.info("Successfully completed execution of datagen.py.")
+def format_markdown():
+    logging.info("Running Prettier to format format.md.")
+    try:
+        subprocess.run(PRETTIER_COMMAND, check=True, shell=True)
+        logging.info("Successfully formatted format.md.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error during Prettier formatting: {e}", exc_info=True)
 
 if __name__ == "__main__":
-    try:
-        if not check_uv_installed():
-            install_uv()
-        download_datagen_script()
-        run_datagen_script()
-    except Exception as e:
-        logging.error(f"An error occurred during execution: {e}", exc_info=True)
+    if navigate_and_install():
+        format_markdown()

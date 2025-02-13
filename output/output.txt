@@ -1,6 +1,5 @@
 
 Reading inline script metadata from `output\script.py`
-2025-02-13 20:21:17,282 - INFO - Checking if 'uv' is installed.
-2025-02-13 20:21:19,559 - INFO - Downloading datagen.py
-2025-02-13 20:21:19,804 - INFO - Running datagen.py.
-2025-02-13 20:21:24,597 - INFO - Successfully completed execution of datagen.py.
+  Ã— No solution found when resolving script dependencies:
+  â•°â”€â–¶ Because subprocess was not found in the package registry and you require
+      subprocess, we can conclude that your requirements are unsatisfiable.
