@@ -1,0 +1,4 @@
+{"debug": "Script started. Attempting to download file."}
+{"error": "Failed to download file. Status code: 404"}
+
+Reading inline script metadata from `output\script.py`
