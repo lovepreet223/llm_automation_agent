@@ -2,4 +2,4 @@
 Each step should only include actions necessary to implement the function, avoiding additional setup like IDE configuration, Git setup, or checking Python installations.
 The code will be executed inside a Docker container running Ubuntu. So, assume a clean Ubuntu environment with Python installed, but no additional dependencies.
 Return the response as a JSON array of step descriptions, where each step is a concise string.
-Task: {task}"
+TASK: {task}"

@@ -4,11 +4,13 @@ import os
 import json
 import re
 import subprocess
+import base64
 
 app = FastAPI()
 
 AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN")  # Load API key from environment
 AIPROXY_BASE_URL = "https://aiproxy.sanand.workers.dev/openai"
+use_openai_api = False
 
 # Base data directory to prevent accessing files outside /data
 BASE_DIR = "/data"
@@ -20,42 +22,54 @@ async def run_task(task: str = Query(..., description="Plain English task descri
         #For each task empty out the files
         open("output/script.py", "w").close()
         open("output/output.txt", "w").close()
-        print("Getting task...")
-        response = prompt("prompts/initial_prompt.txt", task)
+        print("Getting tasks...")
+        #print(task)
+        response = prompt("prompts/initial_prompt.txt", str(task), use_openai_api=use_openai_api)
+        print("Checking file permissions...")
+        #print(response)
+        file_permissions = prompt("prompts/file_rules.txt", str(response), use_openai_api=use_openai_api)
+        #print(file_permissions)
+        if "error" in file_permissions.get("result", {}):
+            error_message = file_permissions["result"]["error"]
+            raise HTTPException(status_code=400, detail=f"AIProxy Error: {error_message}")
         print("Getting Script...")
-        response_script = prompt("prompts/second_prompt.txt", str(response))
+        response_script = prompt("prompts/second_prompt.txt", str(response['result']), use_openai_api=use_openai_api)
         # When invalid file access is required.
-        if "error" in response_script:
-            raise HTTPException(status_code=400, detail=f"AIProxy Error: {response['error']}")
+        if "error" in response_script.get("result", {}):
+            error_message = response_script["result"]["error"]
+            raise HTTPException(status_code=400, detail=f"AIProxy Error: {error_message}")
         # Extract the response and save into script file
         print("Starting script saving process...")
-        print(response_script)
+        #print(response_script)
         extract_and_save_script(response_script)
         # Run the script and save the output
-        print("Saving output...")
+        print("Running Script and Saving output...")
         run_script_and_save_output()
 
         #Running this part if error occurs or persists.
         flag = False
         while not flag:
             print("Running while loop...")
-            code = str(prepare_prompt())
-            up_prompt = str(response) + "\ncode + output: " + code
-            up_response = prompt("prompts/third_prompt.txt", up_prompt)
-            if "success" in up_response:
+            print("Checking Output of the Script...")
+            output = prepare_prompt("output/output.txt")
+            up_response = prompt("prompts/output_check.txt", str(output), use_openai_api=use_openai_api)
+            print(up_response)
+            if "success" in up_response.get("result", {}):
                 flag = True
             else:
+                script = prepare_prompt("output/script.py")
+                up_prompt = {"task": response,
+                             "script": script,
+                             "output": output}
+                up_prompt = json.dumps(up_prompt, indent=4)
+                print(up_prompt)
+                up_response = prompt("prompts/third_prompt.txt", str(up_prompt), use_openai_api=True)
                 print("Starting script saving process...")
                 extract_and_save_script(response_script)
                 # Run the script and save the output
                 print("Saving output...")
                 run_script_and_save_output()
         print("Success")
-
-
-        # When no appropriate function is found.
-        if "error" in response:
-            raise HTTPException(status_code=400, detail=f"AIProxy Error: {response['error']}")
 
     except HTTPException as http_exc:
         raise http_exc  # Re-raise FastAPI-specific exceptions
@@ -96,16 +110,31 @@ async def read_file(path: str = Query(..., description="Path to the file to be r
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
 
-def prompt(file_path, task):
+
+def prompt(file_path, task, use_openai_api=False):
+    """
+    Send the request to prompt and parses the response.
+    :param file_path: file that contains the prompt.
+    :param task: task as passed by the user.
+    :param use_openai_api: whether to use openai API or not
+    :return: returns the response of the LLM.
+    """
     with open(file_path, 'r', encoding='utf-8') as file:
         prompt = file.read()
     prompt = prompt.replace("{task}", task)
 
+    if use_openai_api:
+        api_url = "https://api.openai.com/v1/chat/completions"
+        api_key = OPENAI_API_KEY  # Ensure this is set
+    else:
+        api_url = f"{AIPROXY_BASE_URL}/v1/chat/completions"
+        api_key = AIPROXY_TOKEN  # Ensure this is set
+
     response = requests.post(
-        f"{AIPROXY_BASE_URL}/v1/chat/completions",
+        api_url,
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {AIPROXY_TOKEN}"
+            "Authorization": f"Bearer {api_key}"
         },
         json={
             "model": "gpt-4o-mini",
@@ -114,21 +143,39 @@ def prompt(file_path, task):
     )
 
     response.raise_for_status()  # Ensure we got a successful response
-    raw_content = response.json()["choices"][0]["message"]["content"].strip()
+    raw_content = response.json()["choices"][0]["message"]["content"]
     # Remove Markdown code block syntax if present
-    if raw_content.startswith("```json") and raw_content.endswith("```"):
-        raw_content = raw_content[7:-3].strip()  # Remove ` ```json ` and ` ``` `
+    if raw_content.startswith("```python") and raw_content.endswith("```"):
+        raw_content = base64.b64encode(raw_content.encode()).decode()
+        return {"result": raw_content}
     # Parse the cleaned JSON string into a Python list
-    try:
-        cleaned_result = json.loads(raw_content)
-    except json.JSONDecodeError:
-        cleaned_result = raw_content  # Fallback in case of an error
-    # Return the cleaned list or string
-    return {"result": cleaned_result}
+    elif raw_content.startswith("```json") and raw_content.endswith("```"):
+        raw_content = raw_content[7:-3].strip()  # Remove ` ```json ` and ` ``` `
+        # Parse the cleaned JSON string into a Python list
+        try:
+            raw_content = json.loads(raw_content)
+            return {"result": json.dumps(raw_content)}
+        except json.JSONDecodeError as e:
+            raw_content = raw_content  # Fallback in case of an error
+            return {"error": "Invalid JSON format"}  # Handle errors properly
+
+    # If the format is unknown, return an error
+    if not isinstance(raw_content, str):
+        raw_content = json.dumps(raw_content)  # Convert dict to JSON string
+
+    return {"result": raw_content}  # Now it should return properly formatted JSON
+
 
 def extract_and_save_script(response: dict, filename: str = "output/script.py"):
+    """
+    Parses the code and saves into the file.
+    :param response: code response from the LLM
+    :param filename: Where the file needs to be saved
+    :return: It returns nothing but saves the python code to the file.
+    """
     # Extract the 'result' value
-    result = response.get("result", "")
+    #result = response.get("result", "")
+    result = base64.b64decode(response["result"]).decode()
     # Use regex to extract the Python script inside the triple backticks
     match = re.search(r'```python\n(.*?)\n```', result, re.DOTALL)
     if match:
@@ -142,6 +189,12 @@ def extract_and_save_script(response: dict, filename: str = "output/script.py"):
 
 
 def run_script_and_save_output(script_filename: str = "output/script.py", output_filename: str = "output/output.txt"):
+    """
+    Runs the script and saves the output of the script to the file.
+    :param script_filename: script path that needed to be run.
+    :param output_filename: output file in which the output of the script is saved.
+    :return: returns nothing just saves the output.
+    """
     try:
         # Run the script using 'uv run script.py' command
         result = subprocess.run(["uv", "run", script_filename], capture_output=True, text=True)
@@ -154,29 +207,31 @@ def run_script_and_save_output(script_filename: str = "output/script.py", output
     except Exception as e:
         print(f"Error running script: {e}")
 
-def prepare_prompt(script_path = "output/script.py", output_path="output/output.txt"):
-    try:
-        # Read the script file
-        with open(script_path, "r") as script_file:
-            script_content = script_file.read()
 
+def prepare_prompt(file_path):
+    """
+    Takes the file as input and return its content.
+    :param file_path: file whose content needed to be returned
+    :return: content of the file.
+    """
+    try:
         # Read the output file
-        with open(output_path, "r") as output_file:
+        with open(file_path, "r") as output_file:
             output_content = output_file.read()
 
         # Create the JSON structure
         prompt_data = {
-            "script": script_content,
-            "output": output_content
+            "data": output_content,
         }
 
         # Convert to JSON format
-        return json.dumps(prompt_data, indent=4)
+        return prompt_data
 
     except FileNotFoundError as e:
         return json.dumps({"error": f"File not found: {e}"})
     except Exception as e:
         return json.dumps({"error": f"Unexpected error: {e}"})
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -8,7 +8,7 @@ WORKDIR /llm_automation_agent
 COPY . .
 
 # Install dependencies directly in the Dockerfile
-RUN pip install --no-cache-dir fastapi uvicorn requests
+RUN pip install --no-cache-dir fastapi uvicorn requests uv
 
 # Expose the port FastAPI runs on
 EXPOSE 8000
