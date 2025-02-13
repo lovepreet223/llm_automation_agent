@@ -54,7 +54,6 @@ async def run_task(task: str = Query(..., description="Plain English task descri
             print("Checking Output of the Script...")
             output = prepare_prompt("output/output.txt")
             up_response = prompt("prompts/output_check.txt", str(output), use_openai_api=use_openai_api)
-            print(up_response)
             if "success" in up_response.get("result", {}):
                 flag = True
             else:

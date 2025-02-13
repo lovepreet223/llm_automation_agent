@@ -41,4 +41,9 @@ def process():
     df.to_csv('/data/output.csv', index=False)
 if __name__ == "__main__":
     process()
+
+Always format executable Python commands as:
+uv run script.py
+Do not use python script.py or python3 script.py.
+
 TASK: {task}
