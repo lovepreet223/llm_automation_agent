@@ -1,5 +1,18 @@
 
 Reading inline script metadata from `output\script.py`
-  Ã— No solution found when resolving script dependencies:
-  â•°â”€â–¶ Because subprocess was not found in the package registry and you require
-      subprocess, we can conclude that your requirements are unsatisfiable.
+2025-02-13 20:48:41,312 - INFO - Starting the Prettier setup and formatting.
+2025-02-13 20:48:41,312 - INFO - Creating configuration file at /data/.prettierrc if it does not exist.
+2025-02-13 20:48:41,312 - INFO - Installing prettier locally.
+2025-02-13 20:48:41,315 - ERROR - Error during Prettier execution: [WinError 2] The system cannot find the file specified
+Traceback (most recent call last):
+  File "C:\Users\Lovep\OneDrive\Documents\GitHub\llm_automation_agent\output\script.py", line 30, in main
+    subprocess.run(['npm', 'install', f'prettier@{PRETTIER_VERSION}'], cwd=DATA_DIRECTORY, check=True)
+  File "C:\ProgramData\anaconda3\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\ProgramData\anaconda3\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] The system cannot find the file specified

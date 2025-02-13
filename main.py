@@ -69,7 +69,7 @@ async def run_task(task: str = Query(..., description="Plain English task descri
                 # Run the script and save the output
                 print("Saving output...")
                 run_script_and_save_output()
-        print("Success")
+        return {"status": "success"}
 
     except HTTPException as http_exc:
         raise http_exc  # Re-raise FastAPI-specific exceptions
