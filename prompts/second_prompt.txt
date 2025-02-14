@@ -50,8 +50,15 @@ if __name__ == "__main__":
     process_csv()
 
 I repeat again:
+Do NOT list Python built-in libraries (e.g., subprocess, os, json) as dependencies in uv metadata.
 Always format Python execution as:
     uv run script.py arguments
     Do NOT use python script.py or python3 script.py.
 
 TASK: {task}
+
+I repeat again:
+Do NOT list Python built-in libraries (e.g., subprocess, os, json) as dependencies in uv metadata.
+Always format Python execution as:
+    uv run script.py arguments
+    Do NOT use python script.py or python3 script.py.
