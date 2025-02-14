@@ -22,9 +22,9 @@ RUN pip3 install uv
 # Use a dedicated builder stage for dependencies to enable caching
 FROM base as builder
 
-# Install required Python dependencies using uv
+# Install required Python dependencies using uv (with --system)
 RUN --mount=type=cache,target=/root/.cache \
-    uv pip install --no-deps --compile \
+    uv pip install --system --no-deps --compile \
     requests \
     numpy \
     pandas \
