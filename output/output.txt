@@ -1,26 +1,16 @@
-Name: uv
-Version: 0.5.30
-Summary: An extremely fast Python package and project manager, written in Rust.
-Home-page: https://pypi.org/project/uv/
-Author: uv
-Author-email: "Astral Software Inc." <hey@astral.sh>
-License: MIT OR Apache-2.0
-Location: C:\Users\Lovep\AppData\Roaming\Python\Python311\site-packages
-Requires: 
-Required-by: 
 DISCLAIMER: THIS SCRIPT WILL CHANGE BEFORE THE EVALUATION. TREAT THIS AS A GUIDE.
 Files created at C:\data
 
 Reading inline script metadata from `output\script.py`
-2025-02-13 20:54:39,613 - INFO - Checking if 'uv' package is installed.
-2025-02-13 20:54:41,955 - INFO - The 'uv' package is already installed.
-2025-02-13 20:54:41,955 - INFO - Downloading the script from the provided URL.
+2025-02-14 11:00:41,650 - INFO - Checking if 'uv' is installed.
+2025-02-14 11:00:46,698 - INFO - 'uv' is already installed.
+2025-02-14 11:00:46,698 - INFO - Downloading the script from the specified URL.
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 
   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-  0  8820    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-100  8820  100  8820    0     0  19015      0 --:--:-- --:--:-- --:--:-- 19049
-2025-02-13 20:54:42,432 - INFO - Successfully downloaded the script.
-2025-02-13 20:54:42,432 - INFO - Running the downloaded script.
-2025-02-13 20:54:43,576 - INFO - Script executed successfully.
+100  8820  100  8820    0     0  10793      0 --:--:-- --:--:-- --:--:-- 10822
+100  8820  100  8820    0     0  10787      0 --:--:-- --:--:-- --:--:-- 10808
+2025-02-14 11:00:47,540 - INFO - Script downloaded successfully.
+2025-02-14 11:00:47,540 - INFO - Running the downloaded script.
+2025-02-14 11:00:51,244 - INFO - Script executed successfully.

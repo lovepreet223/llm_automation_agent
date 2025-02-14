@@ -9,7 +9,7 @@ Execution Environment:
     The script runs inside a Dockerized Ubuntu container using uv.
     Use curl for downloading files instead of alternative tools (e.g., wget).
     Always format Python execution as:
-    uv run script.py
+    uv run script.py arguments
     Do NOT use python script.py or python3 script.py.
 Debugging & Error Handling:
     Include debug statements at key execution points:
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
 I repeat again:
 Always format Python execution as:
-    uv run script.py
+    uv run script.py arguments
     Do NOT use python script.py or python3 script.py.
 
 TASK: {task}

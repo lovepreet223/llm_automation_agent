@@ -10,44 +10,39 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Hardcoded variables
-CHECK_UV_CMD = ["pip", "show", "uv"]
-INSTALL_UV_CMD = ["pip", "install", "uv"]
-SCRIPT_URL = "https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/project-1/datagen.py"
-DOWNLOAD_SCRIPT_CMD = ["curl", "-O", SCRIPT_URL]
-RUN_SCRIPT_CMD = ["python", "datagen.py", "24f2006061@ds.study.iitm.ac.in"]
+def check_uv_installed():
+    logging.info("Checking if 'uv' is installed.")
+    result = subprocess.run(['pip', 'show', 'uv'], capture_output=True, text=True)
+    if result.returncode != 0:
+        logging.warning("'uv' not found, attempting to install.")
+        install_uv()
+    else:
+        logging.info("'uv' is already installed.")
 
-def check_and_install_uv():
-    logging.info("Checking if 'uv' package is installed.")
+def install_uv():
     try:
-        subprocess.run(CHECK_UV_CMD, check=True)
-        logging.info("The 'uv' package is already installed.")
-    except subprocess.CalledProcessError:
-        logging.warning("'uv' package is not installed. Installing now...")
-        try:
-            subprocess.run(INSTALL_UV_CMD, check=True)
-            logging.info("Successfully installed 'uv' package.")
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Error installing 'uv': {e}", exc_info=True)
-            return False
-    return True
-
-def download_and_run_script():
-    try:
-        logging.info("Downloading the script from the provided URL.")
-        subprocess.run(DOWNLOAD_SCRIPT_CMD, check=True)
-        logging.info("Successfully downloaded the script.")
+        subprocess.run(['pip', 'install', 'uv'], check=True)
+        logging.info("'uv' installed successfully.")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Error downloading script: {e}", exc_info=True)
-        return
-    
+        logging.error(f"Failed to install 'uv': {e}", exc_info=True)
+
+def download_script():
+    logging.info("Downloading the script from the specified URL.")
     try:
-        logging.info("Running the downloaded script.")
-        subprocess.run(RUN_SCRIPT_CMD, check=True)
+        subprocess.run(['curl', '-O', 'https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/project-1/datagen.py'], check=True)
+        logging.info("Script downloaded successfully.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error downloading the script: {e}", exc_info=True)
+
+def run_script():
+    logging.info("Running the downloaded script.")
+    try:
+        subprocess.run(['uv', 'run', 'datagen.py', '24f2006061@ds.study.iitm.ac.in'], check=True)
         logging.info("Script executed successfully.")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Error running the script: {e}", exc_info=True)
+        logging.error(f"Error executing the script: {e}", exc_info=True)
 
 if __name__ == "__main__":
-    if check_and_install_uv():
-        download_and_run_script()
+    check_uv_installed()
+    download_script()
+    run_script()
