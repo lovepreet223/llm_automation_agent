@@ -7,14 +7,20 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    nodejs \
-    npm \
     python3.10 \
     python3-pip \
     sqlite3 \
+    npm \
     git \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js (latest LTS version)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
+# Verify installation
+RUN node -v && npm -v
 
 # Install uv (fast package manager)
 RUN pip3 install uv
