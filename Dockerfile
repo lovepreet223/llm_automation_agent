@@ -29,7 +29,7 @@ FROM base as builder
 
 # Install Python dependencies using uv (with --system flag)
 RUN --mount=type=cache,target=/root/.cache \
-    uv pip install --system --no-deps --compile \
+    uv pip install --system --compile \
     requests \
     numpy \
     pandas \
