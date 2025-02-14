@@ -14,21 +14,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv (Python package manager) and necessary Python dependencies
-RUN pip3 install uv && uv pip install \
-    requests \
-    numpy \
-    pandas \
-    duckdb \
-    pillow \
-    scipy \
-    tiktoken \
-    gitpython \
-    beautifulsoup4 \
-    selenium \
-    markdown \
-    fastapi \
-    uvicorn \
-    ffmpeg-python
+RUN pip3 install uv
+RUN pip3 install requests numpy pandas duckdb pillow scipy \
+    tiktoken gitpython beautifulsoup4 selenium markdown \
+    fastapi uvicorn ffmpeg-python
+
 
 # Install Prettier globally via npm
 RUN npm install -g prettier@3.4.2
