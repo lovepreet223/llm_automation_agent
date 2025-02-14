@@ -1,6 +1,7 @@
 # Use Ubuntu as base image
 FROM ubuntu:22.04
 
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 # Install required packages
 RUN apt-get update && apt-get install -y \
     curl \
