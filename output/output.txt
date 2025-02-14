@@ -1,18 +1,26 @@
+Name: uv
+Version: 0.5.30
+Summary: An extremely fast Python package and project manager, written in Rust.
+Home-page: https://pypi.org/project/uv/
+Author: uv
+Author-email: "Astral Software Inc." <hey@astral.sh>
+License: MIT OR Apache-2.0
+Location: C:\Users\Lovep\AppData\Roaming\Python\Python311\site-packages
+Requires: 
+Required-by: 
+DISCLAIMER: THIS SCRIPT WILL CHANGE BEFORE THE EVALUATION. TREAT THIS AS A GUIDE.
+Files created at C:\data
 
 Reading inline script metadata from `output\script.py`
-2025-02-13 20:48:41,312 - INFO - Starting the Prettier setup and formatting.
-2025-02-13 20:48:41,312 - INFO - Creating configuration file at /data/.prettierrc if it does not exist.
-2025-02-13 20:48:41,312 - INFO - Installing prettier locally.
-2025-02-13 20:48:41,315 - ERROR - Error during Prettier execution: [WinError 2] The system cannot find the file specified
-Traceback (most recent call last):
-  File "C:\Users\Lovep\OneDrive\Documents\GitHub\llm_automation_agent\output\script.py", line 30, in main
-    subprocess.run(['npm', 'install', f'prettier@{PRETTIER_VERSION}'], cwd=DATA_DIRECTORY, check=True)
-  File "C:\ProgramData\anaconda3\Lib\subprocess.py", line 548, in run
-    with Popen(*popenargs, **kwargs) as process:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\ProgramData\anaconda3\Lib\subprocess.py", line 1026, in __init__
-    self._execute_child(args, executable, preexec_fn, close_fds,
-  File "C:\ProgramData\anaconda3\Lib\subprocess.py", line 1538, in _execute_child
-    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [WinError 2] The system cannot find the file specified
+2025-02-13 20:54:39,613 - INFO - Checking if 'uv' package is installed.
+2025-02-13 20:54:41,955 - INFO - The 'uv' package is already installed.
+2025-02-13 20:54:41,955 - INFO - Downloading the script from the provided URL.
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0  8820    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  8820  100  8820    0     0  19015      0 --:--:-- --:--:-- --:--:-- 19049
+2025-02-13 20:54:42,432 - INFO - Successfully downloaded the script.
+2025-02-13 20:54:42,432 - INFO - Running the downloaded script.
+2025-02-13 20:54:43,576 - INFO - Script executed successfully.

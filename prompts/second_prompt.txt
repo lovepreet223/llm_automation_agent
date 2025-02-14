@@ -49,4 +49,9 @@ def process_csv():
 if __name__ == "__main__":
     process_csv()
 
+I repeat again:
+Always format Python execution as:
+    uv run script.py
+    Do NOT use python script.py or python3 script.py.
+
 TASK: {task}

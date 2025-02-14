@@ -1,56 +1,53 @@
 # /// script
 # requires-python = ">=3.09"
 # dependencies = [
-#   "requests",
+#   "uv",
 # ]
 # ///
-import logging
 import subprocess
+import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Hardcoded configurations
-DATA_DIRECTORY = "/data"
-CONFIG_FILE = f"{DATA_DIRECTORY}/.prettierrc"
-PRETTIER_VERSION = "3.4.2"
-FORMAT_FILE = f"{DATA_DIRECTORY}/format.md"
+# Hardcoded variables
+CHECK_UV_CMD = ["pip", "show", "uv"]
+INSTALL_UV_CMD = ["pip", "install", "uv"]
+SCRIPT_URL = "https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/project-1/datagen.py"
+DOWNLOAD_SCRIPT_CMD = ["curl", "-O", SCRIPT_URL]
+RUN_SCRIPT_CMD = ["python", "datagen.py", "24f2006061@ds.study.iitm.ac.in"]
 
-def main():
-    logging.info("Starting the Prettier setup and formatting.")
-
+def check_and_install_uv():
+    logging.info("Checking if 'uv' package is installed.")
     try:
-        # Navigate to the /data directory (simulated by setting the directory variable)
-        logging.info(f"Creating configuration file at {CONFIG_FILE} if it does not exist.")
-        with open(CONFIG_FILE, 'w') as f:
-            f.write('{"semi": true, "singleQuote": true}')  # Example configuration for Prettier
+        subprocess.run(CHECK_UV_CMD, check=True)
+        logging.info("The 'uv' package is already installed.")
+    except subprocess.CalledProcessError:
+        logging.warning("'uv' package is not installed. Installing now...")
+        try:
+            subprocess.run(INSTALL_UV_CMD, check=True)
+            logging.info("Successfully installed 'uv' package.")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Error installing 'uv': {e}", exc_info=True)
+            return False
+    return True
 
-        # Install prettier locally
-        logging.info("Installing prettier locally.")
-        subprocess.run(['npm', 'install', f'prettier@{PRETTIER_VERSION}'], cwd=DATA_DIRECTORY, check=True)
-
-        # Run prettier with the update-in-place option
-        logging.info(f"Running prettier on {FORMAT_FILE}.")
-        subprocess.run(['npx', 'prettier', '--write', FORMAT_FILE], cwd=DATA_DIRECTORY, check=True)
-
-        # Verify that the /data/format.md file has been formatted correctly
-        logging.info(f"Verifying the content of {FORMAT_FILE}.")
-        with open(FORMAT_FILE, 'r') as f:
-            content = f.read()
-            if "formatted" in content:  # Assuming the content is verified for a specific keyword
-                logging.info(f"Formatting verification successful for {FORMAT_FILE}.")
-            else:
-                logging.error(f"Formatting verification failed for {FORMAT_FILE}.")
-
-        # Clean up - remove node_modules and package-lock.json if created during installation
-        logging.info("Cleaning up temporary files.")
-        subprocess.run(['rm', '-rf', f'{DATA_DIRECTORY}/node_modules'], check=True)
-        subprocess.run(['rm', '-f', f'{DATA_DIRECTORY}/package-lock.json'], check=True)
-
-        logging.info("Prettier setup and formatting completed successfully.")
-
-    except Exception as e:
-        logging.error(f"Error during Prettier execution: {e}", exc_info=True)
+def download_and_run_script():
+    try:
+        logging.info("Downloading the script from the provided URL.")
+        subprocess.run(DOWNLOAD_SCRIPT_CMD, check=True)
+        logging.info("Successfully downloaded the script.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error downloading script: {e}", exc_info=True)
+        return
+    
+    try:
+        logging.info("Running the downloaded script.")
+        subprocess.run(RUN_SCRIPT_CMD, check=True)
+        logging.info("Script executed successfully.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error running the script: {e}", exc_info=True)
 
 if __name__ == "__main__":
-    main()
+    if check_and_install_uv():
+        download_and_run_script()
