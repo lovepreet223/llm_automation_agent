@@ -1,3 +1,6 @@
+# Use the official Python image as a base image
+FROM python:3.10
+
 # Install required packages
 RUN apt-get update && apt-get install -y \
     curl \
