@@ -1,7 +1,9 @@
-# Base image: Use Python slim variant for a smaller footprint
+# Base image: Use Ubuntu for flexibility
 FROM ubuntu:22.04 as base
-# Set non-interactive mode for APT
+
+# Set non-interactive mode for APT to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -16,11 +18,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install uv (fast package manager)
 RUN pip3 install uv
-# Use a dedicated builder stage for dependencies to enable layer caching
+
+# Use a dedicated builder stage for dependencies to enable caching
 FROM base as builder
-# Install required Python dependencies with caching
+
+# Install required Python dependencies using uv
 RUN --mount=type=cache,target=/root/.cache \
-    uv pip install --no-deps --prefer-binary --compile \
+    uv pip install --no-deps --compile \
     requests \
     numpy \
     pandas \
@@ -38,8 +42,10 @@ RUN --mount=type=cache,target=/root/.cache \
 
 # Install Prettier globally (via npm)
 RUN npm install -g prettier@3.4.2
+
 # Final image (runtime environment)
 FROM base as final
+
 # Set the working directory
 WORKDIR /llm_automation_agent
 
@@ -54,5 +60,3 @@ EXPOSE 8000
 
 # Start the FastAPI server
 CMD ["uvicorn", "app:main", "--host", "0.0.0.0", "--port", "8000"]
-
-
